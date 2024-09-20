@@ -1,32 +1,20 @@
 pipeline {
     agent any
-    tools {
-        maven "Maven"
-    }
     stages {
-        stage("Clean up") {
+        stage('Checkout') {
             steps {
-                deleteDir()
+                git 'https://github.com/lilisrv/tp3.git'
             }
         }
-        stage("Clone repo") {
+        stage('Build') {
             steps {
-                sh "git clone https://github.com/lilisrv/tp3.git"
+                bat 'mvn clean install'
             }
         }
-        stage('Generate backend image') {
+        stage('Run Background Process') {
             steps {
-                dir("tp3/backend") {
-                    sh "mvn clean install"
-                    sh "docker build -t backend ."
-                }
-            }
-        }
-        stage("Run docker compose") {
-            steps {
-                dir("tp3/backend") {
-                    sh "docker-compose up -d"
-                }
+                // Remplacer nohup par start
+                bat 'start /b java -jar target/app.jar'
             }
         }
     }
